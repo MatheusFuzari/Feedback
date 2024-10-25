@@ -1,17 +1,19 @@
 package com.bosch.feedforward.services.Impl;
 
 import com.bosch.feedforward.config.security.TokenService;
-import com.bosch.feedforward.dto.TokenDTO;
+import com.bosch.feedforward.dto.LoginResponseDTO;
+import com.bosch.feedforward.dto.PasswordDTO;
 import com.bosch.feedforward.entity.UserEntity;
+import com.bosch.feedforward.exceptions.UserNotFoundException;
 import com.bosch.feedforward.repository.UserRepository;
 import com.bosch.feedforward.services.UserService;
-import org.apache.catalina.User;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,26 +28,53 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserEntity registerUser(UserEntity user) {
+    @Transactional(rollbackOn = Exception.class)
+    public UserEntity registerUser(UserEntity user) throws UserNotFoundException {
         Optional<UserEntity> userFound = this.userRepository.findByEdv(user.getEdv());
 
         if(userFound.isEmpty()){
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return this.userRepository.save(user);
+            if(user.getPassword() != null){
+                user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+            }
+
+            UUID userId = this.userRepository.save(user).getId();
+
+            return this.userRepository.findById(userId).orElseThrow(
+                    UserNotFoundException::new
+            );
         }
 
         return null;
     }
 
     @Override
-    public TokenDTO loginUser(UserEntity user) {
+    public LoginResponseDTO loginUser(UserEntity user) {
         Optional<UserEntity> userFound = this.userRepository.findByEdv(user.getEdv());
+        LoginResponseDTO loginResponse = new LoginResponseDTO();
 
-        if(userFound.isPresent() && passwordEncoder.matches(user.getPassword(), userFound.get().getPassword())){
-            TokenDTO tokenDTO = new TokenDTO();
-            tokenDTO.setToken(this.tokenService.generateToken(userFound.get()));
-            tokenDTO.setDate(LocalDateTime.now());
-            return tokenDTO;
+        if(userFound.isPresent() && userFound.get().getPassword() == null && user.getPassword().isBlank()){
+            loginResponse.setData(userFound.get().getId().toString());
+            loginResponse.setStatus("FIRST_ACCESS");
+            return loginResponse;
+        }else if(userFound.isPresent() && passwordEncoder.matches(user.getPassword(), userFound.get().getPassword())){
+            loginResponse.setData(this.tokenService.generateToken(userFound.get()));
+            loginResponse.setStatus("SUCCESS");
+            return loginResponse;
+        }
+
+        loginResponse.setData("");
+        loginResponse.setStatus("ERROR");
+        return loginResponse;
+    }
+
+    @Override
+    public String firstLogin(UUID id, PasswordDTO data) {
+        Optional<UserEntity> userFound = this.userRepository.findById(id);
+
+        if(userFound.isPresent() && userFound.get().getPassword() == null && data.getPassword().equals(data.getPassword_confirm())){
+            userFound.get().setPassword(this.passwordEncoder.encode(data.getPassword()));
+            this.userRepository.save(userFound.get());
+            return "Password set with success";
         }
 
         return null;

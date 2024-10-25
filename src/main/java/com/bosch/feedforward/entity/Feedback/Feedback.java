@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -28,7 +29,6 @@ public class Feedback {
     @Column(columnDefinition = "boolean default true", nullable = false)
     private Boolean open;
 
-    @NotBlank
-    @Column(nullable = false, unique = true, precision = 3, scale = 2)
-    private Float mean;
+    @Column(precision = 3, scale = 2)
+    private BigDecimal mean;
 }

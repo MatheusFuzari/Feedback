@@ -24,13 +24,13 @@ public class ClassEntity {
     private String name;
 
     @NotBlank
+    @NotNull
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @Column(nullable = false)
     private Course course;
 
     @NotBlank
+    @NotNull
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @Column(nullable = false)
     private UserEntity godparent;
 
     @NotBlank

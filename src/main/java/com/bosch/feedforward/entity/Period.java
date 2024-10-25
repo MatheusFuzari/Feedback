@@ -2,6 +2,7 @@ package com.bosch.feedforward.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.UUID;
@@ -14,6 +15,7 @@ public class Period {
     private UUID id;
 
     @NotBlank
+    @NotNull
     @Column(updatable = false, nullable = false, unique = true)
     private String name;
 }

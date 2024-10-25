@@ -31,8 +31,7 @@ public class SecurityConfig {
                          authorize -> authorize
                                  .requestMatchers("/api/auth/users/**").permitAll()
                                  .requestMatchers("/api/auth/roles/**").hasRole("ADMIN")
-                                 .requestMatchers(HttpMethod.GET, "/api/auth/teste/user").hasRole("APPRENTICE")
-                                 .requestMatchers(HttpMethod.GET, "/api/auth/teste/admin").hasRole("ADMIN")
+                                 .anyRequest().permitAll()
 
                  ).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
