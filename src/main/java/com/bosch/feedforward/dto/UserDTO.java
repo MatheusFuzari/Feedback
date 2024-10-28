@@ -1,9 +1,7 @@
 package com.bosch.feedforward.dto;
 
-import com.bosch.feedforward.entity.Role;
+import com.bosch.feedforward.entity.Roles;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -11,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.management.relation.Role;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,18 +37,16 @@ public class UserDTO {
 
     private String password;
 
-    private List<UUID> roles;
+    private List<String> roles;
 
     @JsonIgnore
-    public Set<Role> mapToRoles(){
-        Set<Role> roleIds = new HashSet<>();
+    public Set<Roles> mapToRoles(){
+        Set<Roles> rolesList = new HashSet<>();
 
-        for (UUID roleId: roles){
-            roleIds.add(Role.builder()
-                    .id(roleId)
-                    .build());
+        for (String roleName: roles){
+            Roles.valueOf(roleName);
         };
 
-        return roleIds;
+        return rolesList;
     }
 }

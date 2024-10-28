@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -48,5 +49,19 @@ public class FeedbackQuestionController {
             ).toList();
 
             return ResponseEntity.status(HttpStatus.CREATED).body(questionList);
+    }
+
+    @PutMapping("/question/{id}")
+    private ResponseEntity<FeedbackQuestion> updateQuestion(@PathVariable UUID id, @RequestBody @Valid FeedbackQuestionDTO data){
+        FeedbackQuestion convertedQuestion = new FeedbackQuestion();
+        BeanUtils.copyProperties(data, convertedQuestion, "feedbackCategory");
+        convertedQuestion.setFeedbackCategory(data.mapToCategory());
+        return ResponseEntity.status(HttpStatus.OK).body(this.feedbackQuestionService.updateQuestion(id, convertedQuestion));
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/question/{id}")
+    private void deleteQuestion(@PathVariable UUID id) {
+        this.feedbackQuestionService.deleteQuestion(id);
     }
 }

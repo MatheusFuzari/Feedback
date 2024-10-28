@@ -3,15 +3,20 @@ package com.bosch.feedforward.services.Impl;
 import com.bosch.feedforward.config.security.TokenService;
 import com.bosch.feedforward.dto.LoginResponseDTO;
 import com.bosch.feedforward.dto.PasswordDTO;
+import com.bosch.feedforward.entity.Feedback.Feedback;
+import com.bosch.feedforward.entity.Semester;
 import com.bosch.feedforward.entity.UserEntity;
 import com.bosch.feedforward.exceptions.UserNotFoundException;
+import com.bosch.feedforward.repository.SemesterRepository;
 import com.bosch.feedforward.repository.UserRepository;
+import com.bosch.feedforward.services.Impl.Feedback.FeedbackServiceImpl;
 import com.bosch.feedforward.services.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +25,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private FeedbackServiceImpl feedbackService;
+
+    @Autowired
+    private SemesterRepository semesterRepository;
 
     @Autowired
     private TokenService tokenService;
@@ -37,11 +48,23 @@ public class UserServiceImpl implements UserService {
                 user.setPassword(this.passwordEncoder.encode(user.getPassword()));
             }
 
-            UUID userId = this.userRepository.save(user).getId();
 
-            return this.userRepository.findById(userId).orElseThrow(
-                    UserNotFoundException::new
-            );
+            UserEntity createdUser = this.userRepository.save(user);
+
+            if(createdUser.getRoles().contains("ROLE_APPRENDICE")){
+                Optional<Semester> firstSemester = this.semesterRepository.findByName("Q1");
+
+                this.feedbackService.createFeedback(
+                        Feedback.builder()
+                                .open(false)
+                                .mean(new BigDecimal(0.0))
+                                .user(createdUser)
+                                .semester(firstSemester.isPresent() ? firstSemester.get() : null)
+                                .build()
+                );
+            }
+
+            return createdUser;
         }
 
         return null;

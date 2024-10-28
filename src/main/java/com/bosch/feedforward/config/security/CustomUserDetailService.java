@@ -1,6 +1,5 @@
 package com.bosch.feedforward.config.security;
 
-import com.bosch.feedforward.entity.Role;
 import com.bosch.feedforward.entity.UserEntity;
 import com.bosch.feedforward.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 

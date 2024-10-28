@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Data
-public class ClassPeriod {
+public class ClassSemester {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -18,7 +18,7 @@ public class ClassPeriod {
     private ClassEntity classEntity;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    private Period period;
+    private Semester semester;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", shape = JsonFormat.Shape.STRING)
     private LocalDateTime startDate;

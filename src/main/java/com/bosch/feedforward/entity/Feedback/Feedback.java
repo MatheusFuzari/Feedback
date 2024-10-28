@@ -1,16 +1,22 @@
 package com.bosch.feedforward.entity.Feedback;
 
-import com.bosch.feedforward.entity.Period;
+import com.bosch.feedforward.entity.Semester;
 import com.bosch.feedforward.entity.UserEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Feedback {
 
     @Id
@@ -19,7 +25,7 @@ public class Feedback {
 
     @NotBlank
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    private Period period;
+    private Semester semester;
 
     @NotBlank
     @ManyToOne(optional = false, fetch = FetchType.EAGER)

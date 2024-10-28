@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth/teste")
 @CrossOrigin("*")
-public class TestController {
+public class CourseController {
 
     @GetMapping("/user")
     public ResponseEntity<String> tryUser(){
